@@ -24,13 +24,24 @@ class FrankyService(SlaveService):
         print("Client disconnected")
 
 if __name__ == "__main__":
-    # Attempt to increase process priority for robustness
+    # Attempt to promote to Real-Time scheduler (SCHED_FIFO)
     try:
-        os.nice(-20)
-        print("Successfully set process priority to -20 (High Priority).")
-    except Exception as e:
-        print(f"Warning: Could not set process priority: {e}")
-        print("Consider running with 'sudo' or 'nice -n -20' for better real-time performance.")
+        # SCHED_FIFO requires root privileges. 
+        # We pick a priority of 80 (range is 1-99, 99 is highest).
+        param = os.sched_param(80)
+        os.sched_setscheduler(0, os.SCHED_FIFO, param)
+        print("Successfully set Real-Time Scheduler (SCHED_FIFO, Priority 80).")
+    except Exception as e_rt:
+        print(f"Warning: Could not set SCHED_FIFO: {e_rt}")
+        print("Falling back to nice/process priority...")
+        
+        # Fallback: Attempt to increase process "niceness"
+        try:
+            os.nice(-20)
+            print("Successfully set process priority to -20 (High Priority).")
+        except Exception as e_nice:
+            print(f"Warning: Could not set process priority: {e_nice}")
+            print("Consider running with 'sudo' for real-time performance.")
 
     PORT = int(os.environ.get("FRANKY_SERVER_PORT", 18861))
     print(f"Starting Franky RPC Server on port {PORT}...")
