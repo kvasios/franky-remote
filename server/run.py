@@ -18,7 +18,7 @@ class FrankyService(SlaveService):
     SlaveService is used to allow the client to import arbitrary modules (like franky).
     """
     def on_connect(self, conn):
-        print(f"Client connected: {conn.root}")
+        print(f"Client connected: {conn}")
 
     def on_disconnect(self, conn):
         print("Client disconnected")

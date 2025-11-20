@@ -31,7 +31,12 @@ _conn = _connect()
 
 # Get the remote franky module
 # 'modules' gives access to remote modules
-_remote_franky = _conn.modules.franky
+if hasattr(_conn, "modules"):
+    _remote_franky = _conn.modules.franky
+else:
+    # If using standard rpyc.connect to a SlaveService/FrankyService, 
+    # we can access the module via getmodule
+    _remote_franky = _conn.root.getmodule("franky")
 
 # Populate this module's namespace with the remote module's contents
 # This makes 'from franky import Robot' work
