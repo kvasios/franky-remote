@@ -32,6 +32,8 @@ if __name__ == "__main__":
     t = ThreadedServer(FrankyService, port=PORT, protocol_config={
         'allow_all_attrs': True,
         'allow_public_attrs': True,
+        'allow_setattr': True,
+        'allow_delattr': True,
         'allow_pickle': True, # Useful for numpy arrays if passed by value
     })
     t.start()
