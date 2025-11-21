@@ -54,9 +54,15 @@ servobox run franky-remote-fr3
    pip install rpyc
    ```
 2. Install the client package:
+   
+   **From source (development):**
    ```bash
-   cd client
    pip install -e .
+   ```
+
+   **Directly from GitHub:**
+   ```bash
+   pip install git+https://github.com/YOUR_USERNAME/franky-remote.git
    ```
    *Note: If you already have `franky` installed on the client, you should uninstall it first to avoid conflicts, or rely on PYTHONPATH precedence.*
 

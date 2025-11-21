@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 # Set server IP before importing franky (connection happens at import time)
 # You can also set FRANKY_SERVER_PORT if needed
-# os.environ.setdefault("FRANKY_SERVER_IP", "192.168.1.100")  # Uncomment and set your server IP
+os.environ.setdefault("FRANKY_SERVER_IP", "192.168.122.100")  # RT machine IP
 # os.environ.setdefault("FRANKY_SERVER_PORT", "18861")  # Optional: change port
 
 from franky import Affine, CartesianMotion, Robot, ReferenceType, JointMotion
