@@ -62,7 +62,7 @@ servobox run franky-remote-fr3
 
    **Directly from GitHub:**
    ```bash
-   pip install git+https://github.com/YOUR_USERNAME/franky-remote.git
+   pip install git+https://github.com/kvasios/franky-remote.git
    ```
    *Note: If you already have `franky` installed on the client, you should uninstall it first to avoid conflicts, or rely on PYTHONPATH precedence.*
 
