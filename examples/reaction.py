@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
-
+import os
 # Set server IP before importing franky (connection happens at import time)
 # You can also set FRANKY_SERVER_PORT if needed
-# os.environ.setdefault("FRANKY_SERVER_IP", "192.168.1.100")  # Uncomment and set your server IP
+os.environ.setdefault("FRANKY_SERVER_IP", "192.168.122.100")  # RT machine IP
 # os.environ.setdefault("FRANKY_SERVER_PORT", "18861")  # Optional: change port
 
 from franky import (
@@ -33,16 +33,16 @@ if __name__ == "__main__":
     robot.recover_from_errors()
 
     # Reduce the acceleration and velocity dynamic
-    robot.relative_dynamics_factor = 0.1
+    robot.relative_dynamics_factor = 0.05
 
     # Go to initial position
     robot.move(JointMotion([0.0, 0.0, 0.0, -2.2, 0.0, 2.2, 0.7]))
 
     # Define and move forwards
-    reaction = Reaction(Measure.FORCE_Z < -5.0, CartesianStopMotion())
+    reaction = Reaction(Measure.FORCE_Y > 5, CartesianStopMotion())
     reaction.register_callback(reaction_callback)
     motion_down = CartesianMotion(
-        RobotPose(Affine([0.0, 0.0, 0.5])), ReferenceType.Relative
+        RobotPose(Affine([0.0, -0.3, 0.0])), ReferenceType.Relative
     )
     motion_down.add_reaction(reaction)
 
