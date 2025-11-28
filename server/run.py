@@ -2,6 +2,9 @@ import rpyc
 from rpyc.utils.server import ThreadedServer
 from rpyc.core import SlaveService
 import os
+import time
+import argparse
+import math
 
 # Ensure franky is installed and importable on the server
 try:
@@ -44,16 +47,48 @@ if __name__ == "__main__":
             print("Consider running with 'sudo' for real-time performance.")
 
     PORT = int(os.environ.get("FRANKY_SERVER_PORT", 18861))
-    print(f"Starting Franky RPC Server on port {PORT}...")
     
-    # protocol_config with allow_all_attrs=True is crucial for accessing internal attributes if needed
-    # and for the proxying to feel "transparent".
-    t = ThreadedServer(FrankyService, port=PORT, protocol_config={
-        'allow_all_attrs': True,
-        'allow_public_attrs': True,
-        'allow_setattr': True,
-        'allow_delattr': True,
-        'allow_pickle': True, # Useful for numpy arrays if passed by value
-    })
-    t.start()
+    parser = argparse.ArgumentParser(description="Franky Remote Server")
+    parser.add_argument("--persistent", action="store_true", help="Keep restarting the server on failure (infinite retries).")
+    parser.add_argument("--retries", type=int, default=0, help="Number of retries before exiting (default: 0). Ignored if --persistent is set.")
+    args = parser.parse_args()
+
+    if args.persistent:
+        max_retries = math.inf
+    else:
+        max_retries = args.retries
+
+    retry_count = 0
+
+    while retry_count <= max_retries:
+        try:
+            print(f"Starting Franky RPC Server on port {PORT}...")
+            
+            # protocol_config with allow_all_attrs=True is crucial for accessing internal attributes if needed
+            # and for the proxying to feel "transparent".
+            t = ThreadedServer(FrankyService, port=PORT, protocol_config={
+                'allow_all_attrs': True,
+                'allow_public_attrs': True,
+                'allow_setattr': True,
+                'allow_delattr': True,
+                'allow_pickle': True, # Useful for numpy arrays if passed by value
+            })
+            t.start()
+            # If server stops cleanly, we assume we shouldn't restart unless intended otherwise.
+            # Typically start() blocks until close() is called or an exception raised.
+            break
+        except Exception as e:
+            # Check if we should retry
+            if not args.persistent and retry_count >= max_retries:
+                 print(f"Server crashed with error: {e}")
+                 print(f"Max retries ({max_retries}) reached. Exiting.")
+                 raise e
+            
+            retry_count += 1
+            print(f"Server crashed with error: {e}")
+            
+            wait_time = 1
+            retry_msg = f"{retry_count}/{max_retries}" if not args.persistent else f"{retry_count}/inf"
+            print(f"Attempting recovery ({retry_msg}) in {wait_time} seconds...")
+            time.sleep(wait_time)
 

@@ -44,6 +44,9 @@ servobox run franky-remote-fr3
    ```bash
    # Runs with SCHED_FIFO priority if possible
    sudo python3 server/run.py
+
+   # For infinite recovery on failure:
+   sudo python3 server/run.py --persistent
    ```
    (You can set the port via `FRANKY_SERVER_PORT` env var, default is 18861)
 
